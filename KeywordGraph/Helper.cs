@@ -6,6 +6,7 @@ using KeywordGraph;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
+using OllamaSharp.Models;
 
 namespace KeywordGraph;
 
@@ -89,6 +90,40 @@ public class Helper
             var embeddings = await ollama.GenerateVectorAsync(word, embeddingOptions);
             Console.WriteLine(embeddings.ToArray());
             vectors.Add((word, embeddings.ToArray()));
+        }
+
+        TransformAndSaveCsv(vectors, "animals.csv");
+    }
+
+    public static async Task GenerateEmbeddingsUsingEmbedRequest(string[] words)
+    {
+        var uri = new Uri("http://localhost:11434");
+        var ollama = new OllamaApiClient(uri);
+        var vectors = new List<(string Word, float[] Vectors)>();
+
+        ollama.SelectedModel = "qwen3-embedding";
+
+        EmbeddingGenerationOptions embeddingOptions = new();
+        embeddingOptions.Dimensions = 512;
+        embeddingOptions.ModelId = "qwen3-embedding";
+
+        foreach (var word in words)
+        {
+            try
+            {
+                EmbedRequest request = new();
+                request.Dimensions = 512;
+                request.Input = new List<string>() { "word" };
+                request.Model = "qwen3-embedding";
+
+                var embeddings = await ollama.EmbedAsync(request);
+                //Console.WriteLine(embeddings.ToArray());
+                vectors.Add((word, embeddings.Embeddings[0].ToArray()));
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         TransformAndSaveCsv(vectors, "animals.csv");
