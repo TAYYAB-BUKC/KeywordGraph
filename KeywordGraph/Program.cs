@@ -1,2 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿// set up the client
+
+using KeywordGraph;
+
+var words = new[] { "cat", "mouse", "lion", "tiger", "helicopter", "train", "blue", "carrot", "space" };
+
+await Helper.GenerateEmbeddings(words);
+
+Console.ReadKey();
