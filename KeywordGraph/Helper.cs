@@ -2,7 +2,10 @@ using System;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using KeywordGraph;
 using MathNet.Numerics.LinearAlgebra;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
 
 namespace KeywordGraph;
 
@@ -69,5 +72,25 @@ public class Helper
         if (needsQuotes)
             return "\"" + s.Replace("\"", "\"\"") + "\"";
         return s;
+    }
+
+    public static async Task GenerateEmbeddings(string[] words)
+    {
+        var uri = new Uri("http://localhost:11434");
+        var ollama = new OllamaApiClient(uri);
+        var vectors = new List<(string Word, float[] Vectors)>();
+
+        ollama.SelectedModel = "qwen3-embedding";
+        EmbeddingGenerationOptions embeddingOptions = new();
+        embeddingOptions.Dimensions = 512;
+
+        foreach (var word in words)
+        {
+            var embeddings = await ollama.GenerateVectorAsync(word, embeddingOptions);
+            Console.WriteLine(embeddings.ToArray());
+            vectors.Add((word, embeddings.ToArray()));
+        }
+
+        TransformAndSaveCsv(vectors, "animals.csv");
     }
 }
