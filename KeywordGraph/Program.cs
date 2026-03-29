@@ -6,6 +6,7 @@ var words = new[] { "cat", "mouse", "lion", "tiger", "helicopter", "train", "blu
 
 await Helper.GenerateEmbeddings(words);
 
+Console.WriteLine("Embeddings Generated.");
 #region Attempt 1
 // using Microsoft.Extensions.AI;
 // using OllamaSharp;

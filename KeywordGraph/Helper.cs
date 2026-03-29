@@ -55,7 +55,7 @@ public class Helper
 
         // Write CSV: id,title,x,y (culture-invariant)
         using var sw = new StreamWriter(path, false, Encoding.UTF8);
-        sw.WriteLine("id,title,x,y");
+        sw.WriteLine("WORD,X,Y");
 
         for (int i = 0; i < n; i++)
         {
@@ -81,14 +81,15 @@ public class Helper
         var ollama = new OllamaApiClient(uri);
         var vectors = new List<(string Word, float[] Vectors)>();
 
-        ollama.SelectedModel = "qwen3-embedding";
-        EmbeddingGenerationOptions embeddingOptions = new();
-        embeddingOptions.Dimensions = 512;
+        ollama.SelectedModel = "qwen3-embedding:0.6b";
+        EmbeddingGenerationOptions embeddingOptions = new()
+        {
+            Dimensions = 512
+        };
 
         foreach (var word in words)
         {
             var embeddings = await ollama.GenerateVectorAsync(word, embeddingOptions);
-            Console.WriteLine(embeddings.ToArray());
             vectors.Add((word, embeddings.ToArray()));
         }
 
